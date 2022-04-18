@@ -1,14 +1,17 @@
 import express from 'express';
 import * as bodyParser from 'body-parser';
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config()
 
 class App {
     public app: express.Application;
-    public port: number;
+    private port = process.env.PORT;
+    private mongodbUrl = process.env.MONGO_DB_URL
 
-    constructor(controllers: any, port: number) {
+    constructor(controllers: any) {
         this.app = express();
-        this.port = port;
 
         this.initializeMiddlewares();
         this.initializeLoggerMiddleware();
@@ -37,8 +40,8 @@ class App {
     }
 
     public connectToMongo() {
-        mongoose.connect('mongodb://localhost:27017/project_mmo', () => {
-            console.log('connected to database')
+        mongoose.connect(`${this.mongodbUrl}`, () => {
+            console.log(`connected to database url: ${this.mongodbUrl}`)
         })
     }
 
