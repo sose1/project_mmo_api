@@ -1,5 +1,6 @@
 import express, {Request, Response} from "express";
 import UserService from "../domain/UserService";
+import {authorize} from "../../auth/AuthUtils";
 
 class UserController {
     public readonly path = '/users'
@@ -12,6 +13,7 @@ class UserController {
         this.router.post(this.path, this.createUser)
         this.router.patch(this.path + "/:userId", this.updateByID)
         this.router.delete(this.path + "/:userId", this.deleteById)
+        this.router.post(this.path + "/login", this.login)
     }
 
     getAll = async (req: Request, res: Response) => {
@@ -21,9 +23,14 @@ class UserController {
     }
 
     getById = async (req: Request, res: Response) => {
-        const response = await this.userService.getUserById(req.params.userId)
+        const authHeader = req.headers["authorization"] as string
+        let response
+        authorize(authHeader)
+            ? response = await this.userService.getUserById(req.params.userId)
+            : res.sendStatus(401)
+
         if (response == null) {
-            res.statusCode = 404
+            res.sendStatus(404)
         }
         res.send(response);
     }
@@ -35,15 +42,29 @@ class UserController {
     }
 
     updateByID = async (req: Request, res: Response) => {
-        const response = await this.userService.updateById(req)
+        const authHeader = req.headers["authorization"] as string
+        let response
+        authorize(authHeader)
+            ? response = await this.userService.updateById(req)
+            : res.sendStatus(401)
+
         if (response == null) {
-            res.statusCode = 404
+            res.sendStatus(404)
         }
         res.send(response)
     }
 
     deleteById = async (req: Request, res: Response) => {
-        const response = await this.userService.deleteById(req.params.userId)
+        const authHeader = req.headers["authorization"] as string
+
+        authorize(authHeader)
+            ? await this.userService.deleteById(req)
+            : res.sendStatus(401)
+    }
+
+    login = async (req: Request, res: Response) => {
+        const {email, password} = req.body;
+        const response = await this.userService.login(email, password);
         res.send(response)
     }
 }
