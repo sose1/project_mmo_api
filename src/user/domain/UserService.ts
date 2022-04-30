@@ -7,8 +7,8 @@ class UserService {
     }
 
     async createUser(req: Request) {
-        const {email, password, isLogged} = req.body;
-        const user = User.build({email, password, isLogged});
+        const {email, password} = req.body;
+        const user = User.build({email, password});
         return await user.save();
     }
 
@@ -21,7 +21,7 @@ class UserService {
     }
 
     async updateById(req: Request) {
-        const {email, password, isLogged} = req.body;
+        const {email, password} = req.body;
         const _id = req.params.userId;
         const authHeader = req.headers["authorization"] as string
         const editor = decodeToken(authHeader)
@@ -31,7 +31,7 @@ class UserService {
             return 401
         }
 
-        await User.findByIdAndUpdate({_id}, {email: email, password: password, isLogged: isLogged});
+        await User.findByIdAndUpdate({_id}, {email: email, password: password});
         return await User.findById(_id);
     }
 
@@ -60,6 +60,16 @@ class UserService {
         }
 
         return await accessToken(email)
+    }
+
+    async getUserByEmail(req: Request) {
+        return await User.findOne(
+            {
+                email: decodeToken(
+                    req.headers["authorization"] as string
+                ).username
+            }
+        )
     }
 }
 

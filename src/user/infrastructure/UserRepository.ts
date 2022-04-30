@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 interface IUser {
     email: string;
     password: string;
-    isLogged: boolean;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -13,7 +12,6 @@ interface UserModelInterface extends mongoose.Model<UserDoc> {
 interface UserDoc extends mongoose.Document {
     email: string;
     password: string;
-    isLogged: boolean;
 }
 
 const userSchema = new mongoose.Schema({
@@ -25,10 +23,6 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    isLogged: {
-        type: Boolean,
-        required: false
     },
 });
 

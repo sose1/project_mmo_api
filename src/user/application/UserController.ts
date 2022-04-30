@@ -14,6 +14,7 @@ class UserController {
         this.router.patch(this.path + "/:userId", this.updateByID)
         this.router.delete(this.path + "/:userId", this.deleteById)
         this.router.post(this.path + "/login", this.login)
+        this.router.get(this.path + "/server/authorize", this.authorizeConnection)
     }
 
     getAll = async (req: Request, res: Response) => {
@@ -66,6 +67,20 @@ class UserController {
         const {email, password} = req.body;
         const response = await this.userService.login(email, password);
         res.send(response)
+    }
+
+    authorizeConnection = async (req: Request, res: Response) => {
+        const authHeader = req.headers["authorization"] as string
+        let response
+
+        authorize(authHeader)
+            ? response = await this.userService.getUserByEmail(req)
+            : res.sendStatus(401)
+
+        if (response == null) {
+            res.sendStatus(404)
+        }
+        res.send(response);
     }
 }
 
