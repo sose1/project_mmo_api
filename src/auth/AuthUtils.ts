@@ -15,7 +15,6 @@ export function authorize(authHeader: string): boolean {
     jwt.verify(token, process.env.TOKEN_SECRET as string, async (err: any) => {
         isAuthorized = !err;
     })
-    console.log("KURWA" + isAuthorized)
     return isAuthorized;
 }
 
