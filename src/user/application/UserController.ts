@@ -9,6 +9,7 @@ class UserController {
 
     constructor() {
         this.router.get(this.path, this.getAll)
+        this.router.get(this.path + "/logout", this.logout)
         this.router.get(this.path + "/:userId", this.getById)
         this.router.post(this.path, this.createUser)
         this.router.patch(this.path + "/:userId", this.updateByID)
@@ -66,6 +67,20 @@ class UserController {
     login = async (req: Request, res: Response) => {
         const {email, password} = req.body;
         const response = await this.userService.login(email, password);
+        res.send(response)
+    }
+
+    logout = async (req: Request, res: Response) => {
+        const authHeader = req.headers["authorization"] as string
+        let response
+
+        authorize(authHeader)
+            ? response = await this.userService.logoutUser(req)
+            : res.sendStatus(401)
+
+        if (response == null) {
+            res.sendStatus(404)
+        }
         res.send(response)
     }
 
