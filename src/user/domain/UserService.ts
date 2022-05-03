@@ -74,7 +74,20 @@ class UserService {
                 new: true
             }
         )
+    }
 
+    async logoutUser(req: Request) {
+        return await User.findOneAndUpdate(
+            {
+                email: decodeToken(req.headers["authorization"] as string).username
+            },
+            {
+                isLogged: false
+            },
+            {
+                new: true
+            }
+        )
     }
 }
 
