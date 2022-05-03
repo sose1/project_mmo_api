@@ -74,7 +74,7 @@ class UserController {
         let response
 
         authorize(authHeader)
-            ? response = await this.userService.getUserByEmail(req)
+            ? response = await this.userService.activateUser(req)
             : res.sendStatus(401)
 
         if (response == null) {

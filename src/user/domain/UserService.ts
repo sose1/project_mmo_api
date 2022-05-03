@@ -62,14 +62,19 @@ class UserService {
         return await accessToken(email)
     }
 
-    async getUserByEmail(req: Request) {
-        return await User.findOne(
+    async activateUser(req: Request) {
+        return await User.findOneAndUpdate(
             {
-                email: decodeToken(
-                    req.headers["authorization"] as string
-                ).username
+                email: decodeToken(req.headers["authorization"] as string).username
+            },
+            {
+                isLogged: true
+            },
+            {
+                new: true
             }
         )
+
     }
 }
 
