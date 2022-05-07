@@ -7,8 +7,8 @@ class UserService {
     }
 
     async createUser(req: Request) {
-        const {email, password} = req.body;
-        const user = User.build({email, password});
+        const {email, password, nickname} = req.body;
+        const user = User.build({email, password, nickname});
         return await user.save();
     }
 

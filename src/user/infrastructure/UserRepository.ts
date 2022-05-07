@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 interface IUser {
     email: string;
     password: string;
+    nickname: string;
 }
 
 interface UserModelInterface extends mongoose.Model<UserDoc> {
@@ -22,6 +23,10 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     password: {
+        type: String,
+        required: true
+    },
+    nickname: {
         type: String,
         required: true
     },
