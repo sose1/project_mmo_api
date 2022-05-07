@@ -12,6 +12,7 @@ interface UserModelInterface extends mongoose.Model<UserDoc> {
 interface UserDoc extends mongoose.Document {
     email: string;
     password: string;
+    isLogged: boolean;
 }
 
 const userSchema = new mongoose.Schema({
