@@ -59,6 +59,10 @@ class UserService {
             return 409
         }
 
+        if (user.isLogged == true) {
+            return 403
+        }
+
         return await accessToken(email)
     }
 
