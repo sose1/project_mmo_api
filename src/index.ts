@@ -1,9 +1,9 @@
 import App from './app';
-import UserController from "./user/application/UserController";
+import PlayerController from "./player/application/PlayerController";
 
 const app = new App(
     [
-        new UserController()
+        new PlayerController()
     ]
 );
 

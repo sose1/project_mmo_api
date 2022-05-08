@@ -1,25 +1,25 @@
 import express, {Request, Response} from "express";
-import UserService from "../domain/UserService";
+import PlayerService from "../domain/PlayerService";
 import {authorize} from "../../auth/AuthUtils";
 
-class UserController {
-    public readonly path = '/users'
+class PlayerController {
+    public readonly path = '/players'
     public readonly router = express.Router()
-    private userService = new UserService()
+    private playerService = new PlayerService()
 
     constructor() {
         this.router.get(this.path, this.getAll)
         this.router.get(this.path + "/logout", this.logout)
-        this.router.get(this.path + "/:userId", this.getById)
-        this.router.post(this.path, this.createUser)
-        this.router.patch(this.path + "/:userId", this.updateByID)
-        this.router.delete(this.path + "/:userId", this.deleteById)
+        this.router.get(this.path + "/:playerId", this.getById)
+        this.router.post(this.path, this.createPlayer)
+        this.router.patch(this.path + "/:playerId", this.updateByID)
+        this.router.delete(this.path + "/:playerId", this.deleteById)
         this.router.post(this.path + "/login", this.login)
         this.router.get(this.path + "/server/authorize", this.authorizeConnection)
     }
 
     getAll = async (req: Request, res: Response) => {
-        const response = await this.userService.getUsers()
+        const response = await this.playerService.getPlayers()
         res.statusCode = 200
         res.send(response);
     }
@@ -28,7 +28,7 @@ class UserController {
         const authHeader = req.headers["authorization"] as string
         let response
         authorize(authHeader)
-            ? response = await this.userService.getUserById(req.params.userId)
+            ? response = await this.playerService.getPLayerById(req.params.playerId)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -37,8 +37,8 @@ class UserController {
         res.send(response);
     }
 
-    createUser = async (req: Request, res: Response) => {
-        const response = await this.userService.createUser(req)
+    createPlayer = async (req: Request, res: Response) => {
+        const response = await this.playerService.createPlayer(req)
         res.statusCode = 201;
         res.send(response)
     }
@@ -47,7 +47,7 @@ class UserController {
         const authHeader = req.headers["authorization"] as string
         let response
         authorize(authHeader)
-            ? response = await this.userService.updateById(req)
+            ? response = await this.playerService.updateById(req)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -60,13 +60,13 @@ class UserController {
         const authHeader = req.headers["authorization"] as string
 
         authorize(authHeader)
-            ? await this.userService.deleteById(req)
+            ? await this.playerService.deleteById(req)
             : res.sendStatus(401)
     }
 
     login = async (req: Request, res: Response) => {
         const {email, password} = req.body;
-        const response = await this.userService.login(email, password);
+        const response = await this.playerService.login(email, password);
         res.send(response)
     }
 
@@ -75,7 +75,7 @@ class UserController {
         let response
 
         authorize(authHeader)
-            ? response = await this.userService.logoutUser(req)
+            ? response = await this.playerService.logoutPlayer(req)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -89,7 +89,7 @@ class UserController {
         let response
 
         authorize(authHeader)
-            ? response = await this.userService.activateUser(req)
+            ? response = await this.playerService.activatePlayer(req)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -99,4 +99,4 @@ class UserController {
     }
 }
 
-export default UserController
+export default PlayerController
