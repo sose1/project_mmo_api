@@ -1,22 +1,22 @@
 import mongoose from "mongoose";
 
-interface IUser {
+interface IPlayer {
     email: string;
     password: string;
     nickname: string;
 }
 
-interface UserModelInterface extends mongoose.Model<UserDoc> {
-    build(attr: IUser): UserDoc
+interface PlayerModelInterface extends mongoose.Model<PlayerDoc> {
+    build(attr: IPlayer): PlayerDoc
 }
 
-interface UserDoc extends mongoose.Document {
+interface PlayerDoc extends mongoose.Document {
     email: string;
     password: string;
     isLogged: boolean;
 }
 
-const userSchema = new mongoose.Schema({
+const playerSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -38,13 +38,13 @@ const userSchema = new mongoose.Schema({
     isLogged: Boolean
 });
 
-userSchema.statics.build = (attr: IUser) => {
-    return new User(attr)
+playerSchema.statics.build = (attr: IPlayer) => {
+    return new Player(attr)
 }
 
-const User = mongoose.model<UserDoc, UserModelInterface>('User', userSchema);
+const Player = mongoose.model<PlayerDoc, PlayerModelInterface>('Player', playerSchema);
 
-const build = (attr: IUser) => {
-    return new User(attr)
+const build = (attr: IPlayer) => {
+    return new Player(attr)
 }
-export default User
+export default Player

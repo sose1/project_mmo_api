@@ -1,73 +1,73 @@
 import {Request} from "express";
-import User from "../infrastructure/UserRepository";
+import Player from "../infrastructure/PlayerRepository";
 import {accessToken, decodeToken} from "../../auth/AuthUtils";
 
-class UserService {
+class PlayerService {
     constructor() {
     }
 
-    async createUser(req: Request) {
+    async createPlayer(req: Request) {
         const {email, password, nickname} = req.body;
-        const user = User.build({email, password, nickname});
-        return await user.save();
+        const player = Player.build({email, password, nickname});
+        return await player.save();
     }
 
-    async getUsers() {
-        return await User.find().select(['-password']);
+    async getPlayers() {
+        return await Player.find().select(['-password']);
     }
 
-    async getUserById(userId: string) {
-        return await User.findById(userId);
+    async getPLayerById(playerId: string) {
+        return await Player.findById(playerId);
     }
 
     async updateById(req: Request) {
         const {email, password} = req.body;
-        const _id = req.params.userId;
+        const _id = req.params.playerId;
         const authHeader = req.headers["authorization"] as string
         const editor = decodeToken(authHeader)
-        const editorDbObject = await User.findOne({email: editor.username})
+        const editorDbObject = await Player.findOne({email: editor.username})
 
         if (editorDbObject != null && editorDbObject._id != _id) {
             return 401
         }
 
-        await User.findByIdAndUpdate({_id}, {email: email, password: password});
-        return await User.findById(_id);
+        await Player.findByIdAndUpdate({_id}, {email: email, password: password});
+        return await Player.findById(_id);
     }
 
     async deleteById(req: Request) {
-        const _id = req.params.userId;
+        const _id = req.params.playerId;
         const authHeader = req.headers["authorization"] as string
         const editor = decodeToken(authHeader)
-        const editorDbObject = await User.findOne({email: editor.username})
+        const editorDbObject = await Player.findOne({email: editor.username})
 
         if (editorDbObject != null && editorDbObject._id != _id) {
             return 401
         }
 
-        return await User.findByIdAndDelete(_id)
+        return await Player.findByIdAndDelete(_id)
     }
 
     async login(email: string, password: string) {
-        const user = await User.findOne({email: email});
+        const player = await Player.findOne({email: email});
 
-        if (user == null) {
+        if (player == null) {
             return 409
         }
 
-        if (password != user.password) {
+        if (password != player.password) {
             return 409
         }
 
-        if (user.isLogged == true) {
+        if (player.isLogged == true) {
             return 403
         }
 
         return await accessToken(email)
     }
 
-    async activateUser(req: Request) {
-        return await User.findOneAndUpdate(
+    async activatePlayer(req: Request) {
+        return await Player.findOneAndUpdate(
             {
                 email: decodeToken(req.headers["authorization"] as string).username
             },
@@ -80,8 +80,8 @@ class UserService {
         )
     }
 
-    async logoutUser(req: Request) {
-        return await User.findOneAndUpdate(
+    async logoutPlayer(req: Request) {
+        return await Player.findOneAndUpdate(
             {
                 email: decodeToken(req.headers["authorization"] as string).username
             },
@@ -95,4 +95,4 @@ class UserService {
     }
 }
 
-export default UserService
+export default PlayerService
