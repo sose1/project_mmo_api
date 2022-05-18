@@ -1,9 +1,11 @@
 import App from './app';
-import PlayerController from "./player/application/PlayerController";
+import CharacterController from "./character/CharacterController";
+import AccountController from "./account/AccountController";
 
 const app = new App(
     [
-        new PlayerController()
+        new CharacterController(),
+        new AccountController()
     ]
 );
 
