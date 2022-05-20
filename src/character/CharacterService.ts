@@ -42,6 +42,32 @@ class CharacterService {
             }
         ).select('-password')
     }
+
+    async deleteCharacter(characterId: string, ownerId: string, authHeader: string) {
+        const editor = await Account.findOne({email: decodeToken(authHeader).username})
+        if (editor != null && editor._id != ownerId) {
+            return 401
+        }
+
+        await Character.findByIdAndDelete(characterId)
+        return await Account.findByIdAndUpdate(
+            {
+                _id: ownerId
+            },
+            {
+                $pullAll: {
+                    characters: [{_id: characterId}],
+                }
+            },
+            {
+                new: true
+            }
+        )
+    }
+
+    async getById(characterId: string) {
+        return await Character.findById(characterId)
+    }
 }
 
 export default CharacterService

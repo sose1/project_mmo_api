@@ -9,7 +9,9 @@ class CharacterController {
 
     constructor() {
         this.router.get(this.path + "/owner/:ownerId", this.getAllByOwnerId)
-        this.router.post(this.path+ "/owner/:ownerId", this.createCharacter)
+        this.router.post(this.path + "/owner/:ownerId", this.createCharacter)
+        this.router.delete(this.path + "/:characterId/owner/:ownerId", this.deleteCharacter)
+        this.router.get(this.path + "/:characterId", this.getById)
 
     }
 
@@ -30,6 +32,26 @@ class CharacterController {
         let response
         authorize(authHeader)
             ? response = await this.characterService.createCharacter(nickname, req.params.ownerId, authHeader)
+            : res.sendStatus(401)
+
+        res.send(response)
+    }
+
+    deleteCharacter = async (req: Request, res: Response) => {
+        const authHeader = req.headers["authorization"] as string
+        let response
+        authorize(authHeader)
+            ? response = await this.characterService.deleteCharacter(req.params.characterId, req.params.ownerId, authHeader)
+            : res.sendStatus(401)
+
+        res.send(response)
+    }
+
+    getById = async (req: Request, res: Response) => {
+        const authHeader = req.headers["authorization"] as string
+        let response
+        authorize(authHeader)
+            ? response = await this.characterService.getById(req.params.characterId)
             : res.sendStatus(401)
 
         res.send(response)
