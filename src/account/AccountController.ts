@@ -1,34 +1,45 @@
 import express, {Request, Response} from "express";
-import PlayerService from "../domain/PlayerService";
-import {authorize} from "../../auth/AuthUtils";
+import AccountService from "./AccountService";
+import {authorize} from "../auth/AuthUtils";
 
-class PlayerController {
-    public readonly path = '/players'
+class AccountController {
+    public readonly path = '/accounts'
     public readonly router = express.Router()
-    private playerService = new PlayerService()
+    private accountService = new AccountService()
 
     constructor() {
         this.router.get(this.path, this.getAll)
         this.router.get(this.path + "/logout", this.logout)
-        this.router.get(this.path + "/:playerId", this.getById)
-        this.router.post(this.path, this.createPlayer)
-        this.router.patch(this.path + "/:playerId", this.updateByID)
-        this.router.delete(this.path + "/:playerId", this.deleteById)
+        this.router.get(this.path + "/:accountId", this.getById)
+        this.router.post(this.path, this.createAccount)
+        this.router.patch(this.path + "/:accountId", this.updateByID)
+        this.router.delete(this.path + "/:accountId", this.deleteById)
         this.router.post(this.path + "/login", this.login)
         this.router.get(this.path + "/server/authorize", this.authorizeConnection)
     }
 
     getAll = async (req: Request, res: Response) => {
-        const response = await this.playerService.getPlayers()
-        res.statusCode = 200
-        res.send(response);
+        const response = await this.accountService.getAccounts()
+        if (response != null) {
+            res.statusCode = 200
+            res.send(response)
+            return;
+        }
+        res.sendStatus(204)
+    }
+
+    createAccount = async (req: Request, res: Response) => {
+        const {email, password} = req.body
+        const response = await this.accountService.createAccount(email, password)
+        res.statusCode = 201
+        res.send(response)
     }
 
     getById = async (req: Request, res: Response) => {
         const authHeader = req.headers["authorization"] as string
         let response
         authorize(authHeader)
-            ? response = await this.playerService.getPLayerById(req.params.playerId)
+            ? response = await this.accountService.getAccountById(req.params.accountId)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -37,17 +48,11 @@ class PlayerController {
         res.send(response);
     }
 
-    createPlayer = async (req: Request, res: Response) => {
-        const response = await this.playerService.createPlayer(req)
-        res.statusCode = 201;
-        res.send(response)
-    }
-
     updateByID = async (req: Request, res: Response) => {
         const authHeader = req.headers["authorization"] as string
         let response
         authorize(authHeader)
-            ? response = await this.playerService.updateById(req)
+            ? response = await this.accountService.updateById(req)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -60,13 +65,13 @@ class PlayerController {
         const authHeader = req.headers["authorization"] as string
 
         authorize(authHeader)
-            ? await this.playerService.deleteById(req)
+            ? await this.accountService.deleteById(req)
             : res.sendStatus(401)
     }
 
     login = async (req: Request, res: Response) => {
         const {email, password} = req.body;
-        const response = await this.playerService.login(email, password);
+        const response = await this.accountService.login(email, password);
         res.send(response)
     }
 
@@ -75,7 +80,7 @@ class PlayerController {
         let response
 
         authorize(authHeader)
-            ? response = await this.playerService.logoutPlayer(req)
+            ? response = await this.accountService.logout(authHeader)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -89,7 +94,7 @@ class PlayerController {
         let response
 
         authorize(authHeader)
-            ? response = await this.playerService.activatePlayer(req)
+            ? response = await this.accountService.activatePlayer(authHeader)
             : res.sendStatus(401)
 
         if (response == null) {
@@ -99,4 +104,4 @@ class PlayerController {
     }
 }
 
-export default PlayerController
+export default AccountController
