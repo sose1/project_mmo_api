@@ -6,6 +6,7 @@ class AccountService {
 
     constructor() {
     }
+
     async getAccounts() {
         let accounts
         accounts = await Account.find().select(['-password']);
@@ -34,8 +35,8 @@ class AccountService {
         if (account.isLogged == true) {
             return 403
         }
-
-        return await accessToken(email)
+        const res = await Account.findOne({email: email}).select(['-password']);
+        return {accessToken: await accessToken(email), account: res};
     }
 
     async logout(authHeader: string) {
@@ -65,6 +66,7 @@ class AccountService {
             }
         )
     }
+
     async getAccountById(accountId: string) {
         return await Account.findById(accountId);
     }

@@ -1,5 +1,4 @@
 import Character from "./CharacterRepository";
-import mongoose from "mongoose";
 import {decodeToken} from "../auth/AuthUtils";
 import Account from "../account/AccountRepository";
 
@@ -9,7 +8,7 @@ class CharacterService {
 
     async getCharacters(ownerId: string) {
         let characters
-        characters = await Character.find(new mongoose.Schema.Types.ObjectId(ownerId));
+        characters = await Character.find({owner: ownerId}).exec();
         if (characters.length == 0)
             return null
 
@@ -62,7 +61,7 @@ class CharacterService {
             {
                 new: true
             }
-        )
+        ).select(['-password'])
     }
 
     async getById(characterId: string) {

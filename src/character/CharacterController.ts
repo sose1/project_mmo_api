@@ -19,7 +19,7 @@ class CharacterController {
          const response = await this.characterService.getCharacters(req.params.ownerId)
          if (response != null) {
              res.statusCode = 200
-             res.send(response)
+             res.send({response})
              return;
          }
          res.sendStatus(204)
