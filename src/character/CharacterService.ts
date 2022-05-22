@@ -67,6 +67,20 @@ class CharacterService {
     async getById(characterId: string) {
         return await Character.findById(characterId)
     }
+
+    async activatePlayer(characterId: string) {
+        return await Character.findOneAndUpdate(
+            {
+                _id: characterId
+            },
+            {
+                isActive: true
+            },
+            {
+                new: true
+            }
+        )
+    }
 }
 
 export default CharacterService

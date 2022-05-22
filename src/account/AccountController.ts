@@ -15,7 +15,6 @@ class AccountController {
         this.router.patch(this.path + "/:accountId", this.updateByID)
         this.router.delete(this.path + "/:accountId", this.deleteById)
         this.router.post(this.path + "/login", this.login)
-        this.router.get(this.path + "/server/authorize", this.authorizeConnection)
     }
 
     getAll = async (req: Request, res: Response) => {
@@ -89,19 +88,6 @@ class AccountController {
         res.send(response)
     }
 
-    authorizeConnection = async (req: Request, res: Response) => {
-        const authHeader = req.headers["authorization"] as string
-        let response
-
-        authorize(authHeader)
-            ? response = await this.accountService.activatePlayer(authHeader)
-            : res.sendStatus(401)
-
-        if (response == null) {
-            res.sendStatus(404)
-        }
-        res.send(response);
-    }
 }
 
 export default AccountController

@@ -12,17 +12,17 @@ class CharacterController {
         this.router.post(this.path + "/owner/:ownerId", this.createCharacter)
         this.router.delete(this.path + "/:characterId/owner/:ownerId", this.deleteCharacter)
         this.router.get(this.path + "/:characterId", this.getById)
-
+        this.router.get(this.path + "/:characterId/server/authorize", this.authorizeConnection)
     }
 
-     getAllByOwnerId =  async (req: Request, res: Response) => {
-         const response = await this.characterService.getCharacters(req.params.ownerId)
-         if (response != null) {
-             res.statusCode = 200
-             res.send({response})
-             return;
-         }
-         res.sendStatus(204)
+    getAllByOwnerId = async (req: Request, res: Response) => {
+        const response = await this.characterService.getCharacters(req.params.ownerId)
+        if (response != null) {
+            res.statusCode = 200
+            res.send({response})
+            return;
+        }
+        res.sendStatus(204)
     }
 
     createCharacter = async (req: Request, res: Response) => {
@@ -55,6 +55,20 @@ class CharacterController {
             : res.sendStatus(401)
 
         res.send(response)
+    }
+
+    authorizeConnection = async (req: Request, res: Response) => {
+        const authHeader = req.headers["authorization"] as string
+        let response
+
+        authorize(authHeader)
+            ? response = await this.characterService.activatePlayer(req.params.characterId)
+            : res.sendStatus(401)
+
+        if (response == null) {
+            res.sendStatus(404)
+        }
+        res.send(response);
     }
 }
 

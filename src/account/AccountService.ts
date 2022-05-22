@@ -1,6 +1,7 @@
 import Account from "./AccountRepository";
 import {accessToken, decodeToken} from "../auth/AuthUtils";
 import {Request} from "express";
+import Character from "../character/CharacterRepository";
 
 class AccountService {
 
@@ -35,31 +36,22 @@ class AccountService {
         if (account.isLogged == true) {
             return 403
         }
-        const res = await Account.findOne({email: email}).select(['-password']);
+        const res = await Account.findOneAndUpdate({email: email}, {isLogged:true}, {new: true}).select(['-password']);
         return {accessToken: await accessToken(email), account: res};
     }
 
     async logout(authHeader: string) {
+        await Character.updateMany(
+            {"owner": await Account.findOne({email: decodeToken(authHeader).username}).select('_id')},
+            {"$set":{"isActive": false}}
+        );
+
         return await Account.findOneAndUpdate(
             {
                 email: decodeToken(authHeader).username
             },
             {
                 isLogged: false
-            },
-            {
-                new: true
-            }
-        )
-    }
-
-    async activatePlayer(authHeader: string) {
-        return await Account.findOneAndUpdate(
-            {
-                email: decodeToken(authHeader).username
-            },
-            {
-                isLogged: true
             },
             {
                 new: true
